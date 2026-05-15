@@ -28,14 +28,17 @@ public class PowerUp : MonoBehaviour
                 break;
 
             case Type.ExtraLife:
+                AudioManager.Instance?.PlayPowerUp();
                 GameManager.Instance.AddLife();
                 break;
 
             case Type.MagicMushroom:
+                AudioManager.Instance?.PlayPowerUp();
                 player.GetComponent<Player>().Grow();
                 break;
 
             case Type.Starpower:
+                AudioManager.Instance?.PlayPowerUp();
                 player.GetComponent<Player>().Starpower();
                 break;
         }

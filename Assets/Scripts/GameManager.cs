@@ -9,6 +9,11 @@ public class GameManager : MonoBehaviour
     public int stage { get; private set; }
     public int lives { get; private set; }
     public int coins { get; private set; }
+    public int score { get; private set; }
+    public float timeRemaining { get; private set; }
+
+    private const float LevelTime = 400f;
+    private bool timerRunning;
 
     private void Awake()
     {
@@ -34,18 +39,35 @@ public class GameManager : MonoBehaviour
         NewGame();
     }
 
+    private void Update()
+    {
+        if (!timerRunning) return;
+
+        timeRemaining -= Time.deltaTime;
+
+        if (timeRemaining <= 0f)
+        {
+            timeRemaining = 0f;
+            timerRunning = false;
+            Player player = FindObjectOfType<Player>();
+            if (player != null) player.Death();
+        }
+    }
+
+    public void StartTimer() => timerRunning = true;
+    public void StopTimer() => timerRunning = false;
+
     public void NewGame()
     {
         lives = 3;
         coins = 0;
+        score = 0;
 
         LoadLevel(1, 1);
     }
 
     public void GameOver()
     {
-        // TODO: show game over screen
-
         NewGame();
     }
 
@@ -54,7 +76,16 @@ public class GameManager : MonoBehaviour
         this.world = world;
         this.stage = stage;
 
-        SceneManager.LoadScene($"{world}-{stage}");
+        timeRemaining = LevelTime;
+        timerRunning = true;
+
+        AudioManager.Instance?.PlayLevelMusic();
+
+        string sceneName = $"{world}-{stage}";
+        if (SceneManager.GetActiveScene().name != sceneName)
+        {
+            SceneManager.LoadScene(sceneName);
+        }
     }
 
     public void NextLevel()
@@ -82,12 +113,19 @@ public class GameManager : MonoBehaviour
     public void AddCoin()
     {
         coins++;
+        AddScore(100);
+        AudioManager.Instance?.PlayCoin();
 
         if (coins == 100)
         {
             coins = 0;
             AddLife();
         }
+    }
+
+    public void AddScore(int points)
+    {
+        score += points;
     }
 
     public void AddLife()

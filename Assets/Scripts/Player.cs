@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
         if (!dead && !starpower)
         {
             if (big) {
+                AudioManager.Instance?.PlayDamage();
                 Shrink();
             } else {
                 Death();
@@ -39,6 +40,8 @@ public class Player : MonoBehaviour
         bigRenderer.enabled = false;
         deathAnimation.enabled = true;
 
+        AudioManager.Instance?.PlayDeath();
+        GameManager.Instance.StopTimer();
         GameManager.Instance.ResetLevel(3f);
     }
 
